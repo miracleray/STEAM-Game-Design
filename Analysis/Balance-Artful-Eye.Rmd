@@ -1,0 +1,29 @@
+---
+title: "Balance-Artful-Eye"
+author: "Ariel Marcy"
+date: "3/20/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '../allometry-rodents')
+```
+
+# Artful Eye
+
+
+### Load packages
+```{r}
+library(devtools)
+devtools::install_github("geomorphR/geomorph", ref = "Stable")
+library(stringr)
+```
+
+## Analyzing the card deck
+
+
+```{r}
+prompt.data <- read.csv("../Data/Raw/19_01_09_RawData.csv", header = T)
+arrayspecs(t(test.prompts), 2, 2)
+```
