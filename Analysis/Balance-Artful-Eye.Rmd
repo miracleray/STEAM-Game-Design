@@ -7,23 +7,77 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = '../allometry-rodents')
+knitr::opts_knit$set(root.dir = '../STEAM-Game-Design')
 ```
 
 # Artful Eye
 
 
-### Load packages
+### Load in packages and data
 ```{r}
-library(devtools)
-devtools::install_github("geomorphR/geomorph", ref = "Stable")
 library(stringr)
+library(dplyr)
+prompt.data <- na.omit(read.csv("../Data/Raw/Art_vs_Prompt_cards.csv", header = T))
+prompt.text <- read.csv("../Data/Raw/Prompt_Text.csv", header = F)
 ```
 
-## Analyzing the card deck
-
+## Analyzing the Art card deck with respect to all Prompt cards
 
 ```{r}
-prompt.data <- read.csv("../Data/Raw/19_01_09_RawData.csv", header = T)
-arrayspecs(t(test.prompts), 2, 2)
+prompt.data$Sum <- rowSums(prompt.data)
+histogram(prompt.data$Sum)
+
+# Best and worst cards
+which(prompt.data$Sum == max(prompt.data$Sum))
+which(prompt.data$Sum == min(prompt.data$Sum))
+
+# Lower quartile cards
+low.quant <- which(prompt.data$Sum <= quantile(prompt.data$Sum, 1/4))
+low.scores <- cbind(low.quant, prompt.data[low.quant, dim(prompt.data)[2]])
+
+```
+
+### Look only at good and great plays
+```{r}
+CountGoodPlays <- function(scores, prompts) {
+        scores$good <- NULL
+        scores$great <- NULL
+        for(i in 1:dim(scores)[1]){
+                scores$good[i] <- sum(scores[i, prompts] == 2) 
+                scores$great[i] <- sum(scores[i, prompts] == 3) 
+        }
+        return(scores)
+}
+prompt.data <- CountGoodPlays(prompt.data, c(1:61))
+prompt.data <- mutate(prompt.data, Sum2 = good*2 + great*3)
+
+# Analysis of just good (score = 2) and great (score  = 3) cards
+histogram(prompt.data$Sum2)
+
+# Cards with fewest
+low.quant2 <- which(prompt.data$Sum2 <= quantile(prompt.data$Sum2, 1/4))
+low.scores2 <- cbind(low.quant2, prompt.data[low.quant2, dim(prompt.data)[2]])
+
+# Cards with most ringers
+high.quant2 <- which(prompt.data$Sum2 >= quantile(prompt.data$Sum2, 3/4))
+high.scores2 <- cbind(high.quant2, prompt.data[high.quant2, dim(prompt.data)[2]])
+```
+
+## Analyzing the Prompt card deck with respect to all Art cards
+
+```{r}
+prompt.text$Sum <- colSums(prompt.data[1:length(prompt.text$Sum) - 1])
+histogram(prompt.text$Sum)
+
+# Best and worst cards
+prompt.text[which(prompt.text$Sum == max(prompt.text$Sum)), ]
+prompt.text[which(prompt.text$Sum == min(prompt.text$Sum)), ]
+
+# Lower quartile cards
+low.quant <- which(prompt.data$Sum <= quantile(prompt.data$Sum, 1/4))
+low.cards <- prompt.text[low.quant, ]
+
+# Upper quartile cards
+high.quant <- which(prompt.text$Sum >= quantile(prompt.text$Sum, 3/4))
+high.cards <- prompt.text[high.quant, ]
 ```
