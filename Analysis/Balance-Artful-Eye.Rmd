@@ -74,10 +74,26 @@ prompt.text[which(prompt.text$Sum == max(prompt.text$Sum)), ]
 prompt.text[which(prompt.text$Sum == min(prompt.text$Sum)), ]
 
 # Lower quartile cards
-low.quant <- which(prompt.data$Sum <= quantile(prompt.data$Sum, 1/4))
+low.quant <- which(prompt.text$Sum <= quantile(prompt.text$Sum, 1/4))
 low.cards <- prompt.text[low.quant, ]
 
 # Upper quartile cards
 high.quant <- which(prompt.text$Sum >= quantile(prompt.text$Sum, 3/4))
 high.cards <- prompt.text[high.quant, ]
+```
+
+### Do the above for only ringer plays
+
+```{r}
+prompt.data[prompt.data == 1] <- 0
+prompt.text$Sum2 <- colSums(prompt.data[1:length(prompt.text$Sum)])
+histogram(prompt.text$Sum2)
+
+# Lower quartile cards
+low.quant2 <- which(prompt.text$Sum2 <= quantile(prompt.text$Sum2, 1/4))
+low.cards2 <- prompt.text[low.quant2, ]
+
+# Upper quartile cards
+high.quant2 <- which(prompt.text$Sum2 >= quantile(prompt.text$Sum2, 3/4))
+high.cards2 <- prompt.text[high.quant2, ]
 ```
